@@ -25,7 +25,7 @@ pipeline {
 
         stage('SonarQube Scan') {
             steps {
-                withSonarQubeEnv('sq1') {
+                withSonarQubeEnv('sq1')  {
                     sh """
                         npx sonar-scanner \
                           -Dsonar.projectKey=Profile_web-React \
