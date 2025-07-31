@@ -1,46 +1,19 @@
 pipeline {
     agent any
 
-    tools {
-        nodejs "node20"   // ตั้งชื่อ NodeJS ใน Jenkins Global Tools
-    }
-
-    environment {
-        SONARQUBE_TOKEN = credentials('SONARQUBE_TOKEN') 
-    }
-
     stages {
-        stage('Checkout') {
+        stage('Build') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/NarongritKlinloy/Profile_web-React.git'
+                git 'https://github.com/aeff60/simple-express-app.git'
+                bat "npm install"
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Scan') {
             steps {
-                sh 'npm install'
-            }
-        }
-
-        stage('SonarQube Scan') {
-            steps {
-                withSonarQubeEnv('sq1')  {
-                    sh """
-                        npx sonar-scanner \
-                          -Dsonar.projectKey=Profile_web-React \
-                          -Dsonar.sources=src \
-                          -Dsonar.host.url=http://your-sonar-server:9000 \
-                          -Dsonar.login=$SONARQUBE_TOKEN
-                    """
-                }
-            }
-        }
-
-        stage('Quality Gate') {
-            steps {
-                timeout(time: 5, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
+                withSonarQubeEnv(installationName: 'sq1') {
+                    bat "npm install sonar-scanner"
+                    bat 'npx sonar-scanner -X -X -Dsonar.projectKey=mywebapp'
                 }
             }
         }
